@@ -1,1 +1,1 @@
-# PSAP_jsPsych
+# RC-RAGE_jsPsych

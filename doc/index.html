@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html class=''>
+
+<head>
+    <meta charset='UTF-8'>
+    <meta name="robots" content="noindex">
+    <title>Retaliate or Carry-on: Retaliatory AGression Experiment</title>
+    <link rel='stylesheet' type='text/css'
+        href='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/h/RC-RAGE_jsPsych/lib/rc-rage.css'>
+</head>
+
+<body>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/h/RC-RAGE_jsPsych/lib/jspsych.js'></script>
+    <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/h/RC-RAGE_jsPsych/lib/jspsych-fullscreen.js'></script>
+    <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/h/RC-RAGE_jsPsych/lib/jspsych-instructions.js'></script>
+    <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/h/RC-RAGE_jsPsych/lib/jspsych-audio-keyboard-with-replay.js'></script>
+    <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/h/RC-RAGE_jsPsych/lib/jspsych-rc-rage.js'></script>
+    <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/h/RC-RAGE_jsPsych/lib/rc-rage_main.js'></script>
+
+    <script>
+        $(document).ready(function () {
+
+                    // set the display stage
+                    jQuery('<div class = display_stage_background></div>').appendTo('body');
+                    jQuery('<div class = display_stage></div>').appendTo('body');
+
+                    var takeBackAmount = "0";
+
+                    sbjId = "test";
+                    save_url = "";
+                    var instr_url = 'https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/h/RC-RAGE_jsPsych/instruction_0pt/';
+
+                    var jspsych_session = [];
+
+                    // use the full screen
+                    jspsych_session.push({
+                        type: 'fullscreen',
+                        fullscreen_mode: true
+                    });
+
+                    jspsych_session.push({
+                        timeline: generate_instruction_block(instr_url, parseInt(takeBackAmount))
+                    });
+
+                    jspsych_session.push({
+                        timeline: generate_practice_block(parseInt(takeBackAmount))
+                    });
+
+                    jspsych_session.push({
+                        timeline: generate_main_block(parseInt(takeBackAmount))
+                    });
+
+                    // exit the full screen
+                    jspsych_session.push({
+                        type: 'fullscreen',
+                        fullscreen_mode: false
+                    });
+
+                    jsPsych.init({
+                        timeline: jspsych_session,
+                        display_element: document.querySelector('.display_stage'),
+                        on_finish: function () {
+                            // clear the stage
+                            jQuery('.display_stage').remove();
+                            jQuery('.display_stage_background').remove();
+
+                        }
+                    });
+                });
+    </script>
+</body>
+
+</html>
