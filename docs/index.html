@@ -30,6 +30,7 @@
             sbjId = "test";
             save_url = "";
             var instr_url = 'https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/instruction_0pt/';
+            var instr_imglist = get_instruction_imglist(instr_url, 30);
 
             var jspsych_session = [];
 
@@ -40,7 +41,7 @@
             });
 
             jspsych_session.push({
-                timeline: generate_instruction_block(instr_url, parseInt(takeBackAmount))
+                timeline: generate_instruction_block(instr_imglist, parseInt(takeBackAmount))
             });
 
             jspsych_session.push({
@@ -59,12 +60,22 @@
 
             jsPsych.init({
                 timeline: jspsych_session,
+                preload_images: instr_imglist,
+
                 display_element: document.querySelector('.display_stage'),
+
+                on_data_update: function (data) { // each time the data is updated:
+                    // write the current window resolution to the data
+                    data.win_res = window.innerWidth + 'x' + window.innerHeight;
+                },
+
                 on_finish: function () {
                     // clear the stage
                     jQuery('.display_stage').remove();
                     jQuery('.display_stage_background').remove();
-
+                    if (flag_debug) {
+                        console.log(jsPsych.data.get().json());
+                    }
                 }
             });
         });
