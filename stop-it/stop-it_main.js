@@ -456,7 +456,7 @@ var start_main_page = {
     pages: [
         '<div class = centerbox><p class = block-text>The practice is finished. You will no longer receive immediate feedback in the experimental phase.</p></div>',
         '<div class = centerbox><p class = block-text>However, at the end of each experimental block, there will be a 15 second break. During this break, we will show you some information about your mean performance in the previous block.</p></div>',
-        '<div class = centerbox><p class = block-text>There are ' + num_mainblock.toString() + ' experimental blocks to go.</p>' + 
+        '<div class = centerbox><p class = block-text>There are ' + NexpBL.toString() + ' experimental blocks to go.</p>' + 
         ' <p class = block-text>Please click next when you are ready!</p></div>'
     ],
     show_clickable_nav: true
