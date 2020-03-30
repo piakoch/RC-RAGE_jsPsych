@@ -116,14 +116,14 @@ for (var ii = 0; ii < design.length; ii++) {
         design[ii].first_stimulus = go_stim1;
         design[ii].second_stimulus = stop_stim1;
         design[ii].data.stim = choice_stim1;
-        design[ii].data.correct_response = "stop";
+        design[ii].data.correct_response = "undefined";
         design[ii].data.signal = "yes";
     } else if ((design[ii].stim == choice_stim2) && (design[ii].signal == 'stop')) {
         design[ii].fixation = fix_stim;
         design[ii].first_stimulus = go_stim2;
         design[ii].second_stimulus = stop_stim2;
         design[ii].data.stim = choice_stim2;
-        design[ii].data.correct_response = "stop";
+        design[ii].data.correct_response = "undefined";
         design[ii].data.signal = "yes";
     }
     delete design[ii].signal;
@@ -285,17 +285,14 @@ var stop_signal_trial = {
     on_finish: function (data) {
         // check if the response was correct
         // keys are stored in keycodes not in character, so convert for convenience
-        data.response = jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(data.key_press);
-        // convert explicitly to string so that "undefined" (no response) does not lead to empty cells in the datafile
-        if (data.response == undefined) {
+        if (data.key_press == null) {
+            // convert explicitly to string so that "undefined" (no response) does not lead to empty cells in the datafile
             data.response = "undefined";
-        }
-        if (data.correct_response == "stop") {
-            data.correct = (data.response == "undefined");
         } else {
-            data.correct = (data.response == data.correct_response);
+            data.response = jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(data.key_press);
         }
-        
+        data.correct = (data.response == data.correct_response);
+
         // if no response was made, the reaction time should not be -250 but null
         if (data.rt == -250) {
             data.rt = null
@@ -462,7 +459,7 @@ var start_main_page = {
     pages: [
         '<div class = centerbox><p class = block-text>The practice is finished. You will no longer receive immediate feedback in the next phase.</p></div>',
         '<div class = centerbox><p class = block-text>However, at the end of each block, there will be a 15 second break. During this break, we will show you some information about your mean performance in the previous block.</p></div>',
-        '<div class = centerbox><p class = block-text>There are ' + NexpBL.toString() + ' more blocks to go.</p>' + 
+        '<div class = centerbox><p class = block-text>There are ' + NexpBL.toString() + ' more blocks to go.</p>' +
         ' <p class = block-text>Please click next when you are ready!</p></div>'
     ],
     show_clickable_nav: true
