@@ -12,7 +12,7 @@
 var sbjId = ""; // mturk id
 var task_id = ""; // the prefix for the save file -- the main seq
 var data_dir = "";
-var flag_debug = false;
+var flag_debug = true;
 
 /* 
  * STOP-IT specific variables
@@ -138,10 +138,40 @@ if (flag_debug) {
  */
 var save_url = 'https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/save_data.php';
 
-function save_data() { // CHECK THE URL before use
+function filter_data() {
+    var ignore_columns = ['raw_rt', 'trial_type', 'first_stimulus', 'second_stimulus', 'onset_of_first_stimulus',
+        'onset_of_second_stimulus', 'key_press', 'correct_response', 'trial_index', 'internal_node_id'
+    ];
+    var rows = {
+        trial_type: 'custom-stop-signal-plugin'
+    }; // we are only interested in our main stimulus, not fixation, feedback etc.
+    var selected_data = jsPsych.data.get().filter(rows).ignore(ignore_columns);
+    // the next piece of codes orders the columns of the data file
+    var d = selected_data.values() // get the data values
+    // make an array that specifies the order of the object properties
+    var arr = ['block_i', 'trial_i', 'stim', 'signal', 'SSD', 'response', 'rt', 'correct',
+        'focus', 'Fullscreen', 'time_elapsed', 'window_resolution'
+    ];
+    new_arr = [] // we will fill this array with the ordered data
+    function myFunction(item) { // this is function is called in the arr.forEach call below
+        new_obj[item] = obj[item]
+        return new_obj
+    }
+    // do it for the whole data array
+    for (i = 0; i < d.length; i++) {
+        obj = d[i]; // get one row of data
+        new_obj = {};
+        arr.forEach(myFunction) // for each element in the array run my function
+        selected_data.values()[i] = new_obj; // insert the ordered values back in the jsPsych.data object
+    }
+    return selected_data;
+}
+
+function save_data() {
+    var selected_data = filter_data();
     if (flag_debug) {
         console.log("Save data function called.");
-        console.log(jsPsych.data.get().json());
+        console.log(selected_data.csv());
     }
     jQuery.ajax({
         type: 'post',
@@ -157,7 +187,7 @@ function save_data() { // CHECK THE URL before use
             sbj_id: function () {
                 return sbjId;
             },
-            sess_data: jsPsych.data.get().json()
+            sess_data: selected_data.csv()
         }
     });
 }
@@ -420,6 +450,17 @@ function generate_practice_block() {
         randomize_order: false
     };
 }
+
+var start_main_page = {
+    type: "instructions",
+    pages: [
+        '<div class = centerbox><p class = block-text>The practice is finished. You will no longer receive immediate feedback in the experimental phase.</p></div>',
+        '<div class = centerbox><p class = block-text>However, at the end of each experimental block, there will be a 15 second break. During this break, we will show you some information about your mean performance in the previous block.</p></div>',
+        '<div class = centerbox><p class = block-text>There are ' + num_mainblock.toString() + ' experimental blocks to go.</p>' + 
+        ' <p class = block-text>Please click next when you are ready!</p></div>'
+    ],
+    show_clickable_nav: true
+};
 
 // return the four-main-blocks timeline
 function generate_main_block(num_mainblock) {

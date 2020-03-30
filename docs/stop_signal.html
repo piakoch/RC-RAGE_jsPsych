@@ -4,7 +4,7 @@
 <head>
     <meta charset='UTF-8'>
     <meta name="robots" content="noindex">
-    <title>Retaliate or Carry-on: Reactive AGression Experiment</title>
+    <title>Stop signal task</title>
     <link rel='stylesheet' type='text/css' href='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/lib/rc-rage.css'>
 </head>
 
@@ -13,9 +13,11 @@
     <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/lib/jspsych.js'></script>
     <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/lib/jspsych-fullscreen.js'></script>
     <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/lib/jspsych-instructions.js'></script>
-    <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/jspsych-html-keyboard-response.js'></script>
+    <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/jspsych-html-keyboard-response.js'>
+    </script>
     <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/jspsych-stop-signal-plugin.js'></script>
-    <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/jspsych-detect-held-down-keys.js'></script>
+    <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/jspsych-detect-held-down-keys.js'>
+    </script>
     <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/sprintf.js'></script>
     <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/stop-it_main.js'></script>
 
@@ -29,7 +31,8 @@
             var takeBackAmount = "0";
 
             sbjId = "test";
-            save_url = "";
+            task_id = "stop";
+            data_dir = "data_sst";
 
             var jspsych_session = [];
 
@@ -44,6 +47,7 @@
 
             jspsych_session.push(generate_practice_block());
 
+            jspsych_session.push(start_main_page);
             jspsych_session.push(generate_main_block(NexpBL));
 
             // exit the full screen
@@ -89,6 +93,10 @@
                     jQuery('.display_stage').remove();
                     jQuery('.display_stage_background').remove();
 
+                    if (flag_debug) {
+                        var selected_data = filter_data();
+                        selected_data.localSave('csv', 'SST_data.csv');
+                    }
                 }
             });
         });
