@@ -116,14 +116,14 @@ for (var ii = 0; ii < design.length; ii++) {
         design[ii].first_stimulus = go_stim1;
         design[ii].second_stimulus = stop_stim1;
         design[ii].data.stim = choice_stim1;
-        design[ii].data.correct_response = "undefined";
+        design[ii].data.correct_response = "stop";
         design[ii].data.signal = "yes";
     } else if ((design[ii].stim == choice_stim2) && (design[ii].signal == 'stop')) {
         design[ii].fixation = fix_stim;
         design[ii].first_stimulus = go_stim2;
         design[ii].second_stimulus = stop_stim2;
         design[ii].data.stim = choice_stim2;
-        design[ii].data.correct_response = "undefined";
+        design[ii].data.correct_response = "stop";
         design[ii].data.signal = "yes";
     }
     delete design[ii].signal;
@@ -287,9 +287,15 @@ var stop_signal_trial = {
         // keys are stored in keycodes not in character, so convert for convenience
         data.response = jsPsych.pluginAPI.convertKeyCodeToKeyCharacter(data.key_press);
         // convert explicitly to string so that "undefined" (no response) does not lead to empty cells in the datafile
-        data.response = String(data.response);
-        data.correct = (data.response == data.correct_response);
-
+        if (data.response == undefined) {
+            data.response = "undefined";
+        }
+        if (data.correct_response == "stop") {
+            data.correct = (data.response == "undefined");
+        } else {
+            data.correct = (data.response == data.correct_response);
+        }
+        
         // if no response was made, the reaction time should not be -250 but null
         if (data.rt == -250) {
             data.rt = null
