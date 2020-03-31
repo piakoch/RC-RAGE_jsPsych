@@ -12,7 +12,7 @@
 var sbjId = ""; // mturk id
 var task_id = ""; // the prefix for the save file -- the main seq
 var data_dir = "";
-var flag_debug = true;
+var flag_debug = false;
 
 /* 
  * STOP-IT specific variables
