@@ -458,7 +458,7 @@ var start_main_page = {
     type: "instructions",
     pages: [
         '<div class = centerbox><p class = block-text>The practice is finished. You will no longer receive immediate feedback in the next phase.</p></div>',
-        '<div class = centerbox><p class = block-text>However, at the end of each block, there will be a 15 second break. During this break, we will show you some information about your mean performance in the previous block.</p></div>',
+        '<div class = centerbox><p class = block-text>However, at the end of each block, there will still be a 15 second break. During this break, we will show you some information about your mean performance in the previous block.</p></div>',
         '<div class = centerbox><p class = block-text>There are ' + NexpBL.toString() + ' more blocks to go.</p>' +
         ' <p class = block-text>Please click next when you are ready!</p></div>'
     ],
