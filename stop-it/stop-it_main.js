@@ -61,6 +61,7 @@ var NdesignReps_exp = 8;
 // Number of experimental blocks (excluding the first practice block).
 // Note that NexpBl = 0 will still run the practice block
 var NexpBL = 4;
+var prac_offset = 1; // accounting for the second practice
 
 // ----- CUSTOMISE THE TIME INTERVALS -----
 var ITI = 500; // fixed blank intertrial interval
@@ -70,6 +71,39 @@ var SSD = 200; // start value for the SSD tracking procedure; will be updated th
 var SSDstep = 50; // step size of the SSD tracking procedure; this is also the lowest possible SSD
 var iFBT = 750; // immediate feedback interval (during the practice phase)
 var bFBT = 15000; // break interval between blocks
+
+// Bonus-related variables
+// To change the bonus, modify crit_RT and crit_prop below
+var bonus = 0;
+var block_bonus = 0;
+
+function bonus_RT_comp(avg_RT) {
+    var crit_RT = 550;
+    if (avg_RT > crit_RT) {
+        // no bonus
+        return 0;
+    } else {
+        // the maximum is 75: if avg_RT is less than 400 ms, that's too fast
+        return Math.min(75, Math.round((crit_RT - avg_RT) / 2));
+    }
+}
+
+function bonus_multiplier(prop) {
+    var crit_prop = 0.25;
+    if (prop < 0) {
+        // something is wrong
+        return 0;
+    } else if (prop > crit_prop) {
+        // outside the payzone
+        return 0;
+    } else {
+        return (crit_prop - prop) / crit_prop;
+    }
+}
+
+// the amount of potential bonus is shown at the first few practice blocks
+// but the bonus is actually given after grant_bonus is set to true
+var grant_bonus = false;
 
 
 /* #########################################################################
@@ -196,7 +230,21 @@ function save_data() {
 /*
  * Instruction block
  */
-function generate_instruction_block(num_mainblock) {
+var bonus_desc_page1 = '<div class = centerbox><p class = block-text>The <b>performance-based bonus</b> is determined by multiplying RT score, GO score, and STOP score.</p></div>';
+var bonus_desc_page2 = '<div class = centerbox><p class = block-text><b>RT score</b> is (550 ms - your response time) / 2.</p>' +
+    ' <p class = block-text>If your response time is larger (slower) than 550ms you get no bonus. So please respond as quickly as possible.</p>' +
+    ' <p class = block-text>However, the maximum RT score is 75, so responding faster than 400 ms does no good to you.</p></div>'
+var bonus_desc_page3 = '<div class = centerbox><p class = block-text><b>GO score</b> is (0.25 - the proportion of misses) / 0.25.</p>' +
+    ' <p class = block-text>If you do not have any misses or incorrects, GO score becomes 1.</p>' +
+    ' <p class = block-text>If you miss or respond incorrectly more than 25% of the trials, GO score becomes 0, and you get no bonus. So, please try your best to respond correclty.</p></div>';
+var bonus_desc_page4 = '<div class = centerbox><p class = block-text><b>STOP score</b> is <br>(0.25 - abs(the proportion of successful stops - 0.5)) / 0.25.</p>' +
+    ' <p class = block-text>If the proportion is 0.5, STOP score becomes 1.</p>' +
+    ' <p class = block-text>If the proportion is over 0.75 or below 0.25, STOP score becomes 0, and you get no bonus.</p>' +
+    ' <p class = block-text>Please try your best in the stop trials, and you will get the proportion close to 0.5.</p></div>';
+var bonus_desc_page5 = '<div class = centerbox><p class = block-text>Please remember that <br><b>your bonus = RT score * GO score * STOP score</b>.</p>' +
+    ' <p class = block-text>The maximum bonus you can earn in a block is 75 cents.</p></div>';
+
+function generate_instruction_block() {
     var block_instruction = [];
     var stop_signal_instructions = {
         type: "instructions",
@@ -211,11 +259,19 @@ function generate_instruction_block(num_mainblock) {
             ' <p class = block-text>On the other half of the trials, the stop signals will appear late and it will become very difficult or even impossible to stop your response.</p></div>',
             '<div class = centerbox><p class = block-text>Nevertheless, it is really important that you do not wait for the stop signal to occur and that you respond as quickly and as accurately as possible to the arrows.</p>' +
             ' <p class = block-text>After all, if you start waiting for stop signals, then the program will delay their presentation. This will result in long reaction times.</p></div>',
-            '<div class = centerbox><p class = block-text>We will start with a short practice block in which you will receive immediate feedback. You will no longer receive immediate feedback in the experimental phase.</p>' +
-            ' <p class = block-text>However, at the end of each experimental block, there will be a 15 second break. During this break, we will show you some information about your mean performance in the previous block.</p></div>',
-            '<div class = centerbox><p class = block-text>The experiment consists of 1 practice block and ' + num_mainblock.toString() + ' experimental blocks.</p></div>'
+            '<div class = centerbox><p class = block-text>We will start with a short practice block in which you will receive immediate feedback. You will no longer receive immediate feedback in the next phases.</p>' +
+            ' <p class = block-text>However, at the end of each experimental block, there will be a 15 second break. During this break,' +
+            ' we will show you some information about your mean performance and the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>',
+            bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
+            '<div class = centerbox><p class = block-text>The experiment consists of 2 practice blocks (without actual bonus) and ' + NexpBL.toString() + ' main blocks.</p>' +
+            ' <p class = block-text><b>IMPORTANT: You earn the bonus only in the main blocks.</b></p></div>',
+            '<div class = centerbox><p class = block-text>If you are ready, please click next to start the first practice with immediate, trial-by-trial feedback.</p></div>'
         ],
-        show_clickable_nav: true
+        show_clickable_nav: true,
+        on_finish: function () {
+            // make sure not to grant bonus
+            grant_bonus = false;
+        }
     };
     block_instruction.push(stop_signal_instructions);
     return {
@@ -370,9 +426,15 @@ var trial_feedback = {
 // at the end of the block, give feedback on performance
 var block_feedback = {
     type: 'html-keyboard-response',
-    trial_duration: bFBT,
+    trial_duration: function () {
+        if (block_ind == (NexpBL + prac_offset) || grant_bonus == false) {
+            return 10000000;
+        } else {
+            return bFBT;
+        }
+    },
     choices: function () {
-        if (block_ind == NexpBL) {
+        if (block_ind == (NexpBL + prac_offset) || grant_bonus == false) {
             return ['p', 'space']
         } else {
             return ['p'] // 'p' can be used to skip the feedback, useful for debugging
@@ -406,7 +468,7 @@ var block_feedback = {
         }).count() / ss_trials.count() * 1000) / 1000;
 
         // in the last block, we should not say that there will be a next block
-        if (block_ind == NexpBL) {
+        if (block_ind == (NexpBL + prac_offset) || grant_bonus == false) {
             var next_block_text = "<p class = block-text>Press space to continue...</p>";
         } else { // make a countdown timer
             var count = (bFBT / 1000);
@@ -425,23 +487,44 @@ var block_feedback = {
         }
 
         // the final text to present. Can also show correct and incorrect proportions if requested.
-        return "<div class = centerbox>" +
+        var RT_bonus = bonus_RT_comp(avg_nsRT);
+        var GO_bonus = bonus_multiplier(prop_ns_Missed + prop_ns_Incorrect);
+        var STOP_bonus = bonus_multiplier(Math.abs(prop_ss_Correct - 0.5));
+        block_bonus = Math.round(RT_bonus * GO_bonus * STOP_bonus);
+
+        // block summary
+        var block_summary = "<div class = centerbox>" +
+            "<p class = block-text><b>Your bonus is determined by multiplying RT score, GO score, and STOP score.</b></p>" +
             "<p class = block-text><b>GO TRIALS: </b></p>" +
-            sprintf("<p class = block-text>Average response time = %d ms</p>", avg_nsRT) +
-            sprintf("<p class = block-text>Proportion missed go = %.2f (should be 0)</p>", prop_ns_Missed) +
+            sprintf("<p class = block-text>Average response time = %d ms. <b>RT score</b>: %d.</p>", avg_nsRT, RT_bonus) +
+            sprintf("<p class = block-text>Proportion misses/incorrects = %.2f (should be 0). <br><b>GO score</b>: %.2f.</p>", prop_ns_Missed+prop_ns_Incorrect, GO_bonus) +
             "<p class = block-text><b>STOP-SIGNAL TRIALS: </b></p>" +
-            sprintf("<p class = block-text>Proportion correct stops = %.2f (should be close to 0.5)</p>", prop_ss_Correct) +
-            next_block_text + '</div>';
+            sprintf("<p class = block-text>Proportion correct stops = %.2f (should be close to 0.5). <br><b>STOP score</b>: %.2f.</p>", prop_ss_Correct, STOP_bonus);
+        if (grant_bonus) {
+            block_summary = block_summary +
+                sprintf("<p class = block-text><b>In this block, you earned extra <font color=red>%d (= %d x %.2f x %.2f) cents</font>.</b></p>", block_bonus, RT_bonus, GO_bonus, STOP_bonus) +
+                sprintf("<p class = block-text><b>The total bonus is <font color=blue><span class='large'>%d</span> cents</font>.</b></p>", bonus + block_bonus);
+        } else {
+            block_summary = block_summary +
+                sprintf("<p class = block-text><b>The performance-based bonus is <font color=red>%d (= %d x %.2f x %.2f) cents</font>.</b>", block_bonus, RT_bonus, GO_bonus, STOP_bonus) +
+                ' Since this block was practice, you do not get this bonus.</p>';
+        }
+        block_summary = block_summary + next_block_text + '</div>';
+        return block_summary;
     },
     on_finish: function () {
         save_data();
         trial_ind = 1; // reset trial counter
         block_ind = block_ind + 1; // next block
+        if (grant_bonus) {
+            bonus = bonus + block_bonus;
+            block_bonus = 0;
+        }
     }
 };
 
 // return the one-short-practice block timeline
-function generate_practice_block() {
+function generate_first_practice_block() {
     var trial_seq = {
         timeline: [blank_ITI, held_down_node, stop_signal_trial, trial_feedback],
         timeline_variables: design,
@@ -454,18 +537,55 @@ function generate_practice_block() {
     };
 }
 
+// return the four-main-blocks timeline
+function generate_second_practice_block() {
+    var start_second_practice_page = {
+        type: "instructions",
+        pages: [
+            '<div class = centerbox><p class = block-text>The first practice is finished. You will no longer receive immediate trial-by-trial feedback in the next practice.</p></div>',
+            '<div class = centerbox><p class = block-text>However, at the end of each block, there will still be a 15 second break. During this break,' +
+            ' we will show you some information about your mean performance and the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>',
+            bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
+            '<div class = centerbox><p class = block-text>There are one more practice block and ' + NexpBL.toString() + ' main blocks (with actual bonus) to go.' +
+            ' <b>IMPORTANT: You will get the bonus only during the main blocks.</b></p>' +
+            ' <p class = block-text>Please click next when you are ready for the next practice block!</p></div>'
+        ],
+        show_clickable_nav: true,
+        on_finish: function () {
+            // make sure not to grant bonus
+            grant_bonus = false;
+        }
+    };
+    var trial_seq = {
+        timeline: [blank_ITI, held_down_node, stop_signal_trial],
+        timeline_variables: design,
+        randomize_order: true,
+        repetitions: NdesignReps_exp
+    }
+    return {
+        timeline: [start_second_practice_page, block_start_page, block_get_ready, trial_seq, block_feedback],
+        randomize_order: false
+    };
+}
+
+// return the four-main-blocks timeline
 var start_main_page = {
     type: "instructions",
     pages: [
-        '<div class = centerbox><p class = block-text>The practice is finished. You will no longer receive immediate feedback in the next phase.</p></div>',
-        '<div class = centerbox><p class = block-text>However, at the end of each block, there will still be a 15 second break. During this break, we will show you some information about your mean performance in the previous block.</p></div>',
-        '<div class = centerbox><p class = block-text>There are ' + NexpBL.toString() + ' more blocks to go.</p>' +
+        '<div class = centerbox><p class = block-text>The practice is finished, and you are about to go through the main blocks.</p></div>',
+        '<div class = centerbox><p class = block-text>Like in practice, at the end of each block, we will show you some information about your mean performance and' +
+        ' the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>',
+        bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
+        '<div class = centerbox><p class = block-text>There are ' + NexpBL.toString() + ' more blocks to go. You will <b>keep all the bonus you earn</b> in these blocks. So, please try your best!</p>' +
         ' <p class = block-text>Please click next when you are ready!</p></div>'
     ],
-    show_clickable_nav: true
+    show_clickable_nav: true,
+    on_finish: function () {
+        // in the main blocks, start granting bonus.
+        grant_bonus = true;
+    }
 };
 
-// return the four-main-blocks timeline
 function generate_main_block(num_mainblock) {
     var trial_seq = {
         timeline: [blank_ITI, held_down_node, stop_signal_trial],

@@ -43,9 +43,11 @@
                 fullscreen_mode: true
             });
 
-            jspsych_session.push(generate_instruction_block(NexpBL));
+            jspsych_session.push(generate_instruction_block());
 
-            jspsych_session.push(generate_practice_block());
+            jspsych_session.push(generate_first_practice_block());
+
+            jspsych_session.push(generate_second_practice_block());
 
             jspsych_session.push(start_main_page);
             jspsych_session.push(generate_main_block(NexpBL));
