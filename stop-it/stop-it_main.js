@@ -505,7 +505,7 @@ var block_feedback = {
             sprintf("<p class = block-text>Average response time = %d ms. <b>RT score</b>: %d.</p>", avg_nsRT, RT_bonus) +
             sprintf("<p class = block-text>Proportion misses/incorrects = %.2f (should be 0). <br><b>GO score</b>: %.2f.</p>", prop_ns_Missed+prop_ns_Incorrect, GO_bonus) +
             "<p class = block-text><b>STOP-SIGNAL TRIALS: </b></p>" +
-            sprintf("<p class = block-text>Proportion correct stops = %.2f (should be close to 0.5). <br><b>STOP score</b>: %.2f.</p>", prop_ss_Correct, STOP_bonus);
+            sprintf("<p class = block-text>Proportion correct stops = %.2f (should be 0.5). <br><b>STOP score</b>: %.2f.</p>", prop_ss_Correct, STOP_bonus);
         if (grant_bonus) {
             block_summary = block_summary +
                 sprintf("<p class = block-text><b>In this block, you earned extra <font color=red>%d (= %d x %.2f x %.2f) cents</font>.</b></p>", block_bonus, RT_bonus, GO_bonus, STOP_bonus) +
