@@ -28,11 +28,11 @@ var fullscr_ON = 'no'; // tracks fullscreen activity, initially not activated
 
 // ----- CUSTOMISE THE STIMULI AND RESPONSES -----
 // locate the stimuli that will be used in the experiment
-var fix_stim = 'https://raw.githubusercontent.com/fredvbrug/STOP-IT/master/jsPsych_version/images/fix.png';
-var go_stim1 = 'https://raw.githubusercontent.com/fredvbrug/STOP-IT/master/jsPsych_version/images/go_left.png';
-var go_stim2 = 'https://raw.githubusercontent.com/fredvbrug/STOP-IT/master/jsPsych_version/images/go_right.png';
-var stop_stim1 = 'https://raw.githubusercontent.com/fredvbrug/STOP-IT/master/jsPsych_version/images/stop_left.png';
-var stop_stim2 = 'https://raw.githubusercontent.com/fredvbrug/STOP-IT/master/jsPsych_version/images/stop_right.png';
+var fix_stim = 'https://raw.githubusercontent.com/kywch/RC-RAGE_jsPsych/master/stop-it/fix.png';
+var go_stim1 = 'https://raw.githubusercontent.com/kywch/RC-RAGE_jsPsych/master/stop-it/go_left.png';
+var go_stim2 = 'https://raw.githubusercontent.com/kywch/RC-RAGE_jsPsych/master/stop-it/go_right.png';
+var stop_stim1 = 'https://raw.githubusercontent.com/kywch/RC-RAGE_jsPsych/master/stop-it/stop_left.png';
+var stop_stim2 = 'https://raw.githubusercontent.com/kywch/RC-RAGE_jsPsych/master/stop-it/stop_right.png';
 
 // define the appropriate response (key) for each stimulus
 // (this will also be used to set the allowed response keys)
@@ -234,7 +234,7 @@ var bonus_desc_page1 = '<div class = centerbox><p class = block-text>The <b>perf
 var bonus_desc_page2 = '<div class = centerbox><p class = block-text><b>RT score</b> is (550 ms - your response time) / 2.</p>' +
     ' <p class = block-text>If your response time is larger (slower) than 550ms you get no bonus. So please respond as quickly as possible.</p>' +
     ' <p class = block-text>However, the maximum RT score is 75, so responding faster than 400 ms does no good to you.</p></div>'
-var bonus_desc_page3 = '<div class = centerbox><p class = block-text><b>GO score</b> is (0.25 - the proportion of misses) / 0.25.</p>' +
+var bonus_desc_page3 = '<div class = centerbox><p class = block-text><b>GO score</b> is <br>(0.25 - the proportion of misses and incorrects) / 0.25.</p>' +
     ' <p class = block-text>If you do not have any misses or incorrects, GO score becomes 1.</p>' +
     ' <p class = block-text>If you miss or respond incorrectly more than 25% of the trials, GO score becomes 0, and you get no bonus. So, please try your best to respond correclty.</p></div>';
 var bonus_desc_page4 = '<div class = centerbox><p class = block-text><b>STOP score</b> is <br>(0.25 - abs(the proportion of successful stops - 0.5)) / 0.25.</p>' +
@@ -370,10 +370,16 @@ var stop_signal_trial = {
                 if (SSD >= MAXRT) {
                     SSD = MAXRT - SSDstep;
                 }
+                if (flag_debug) {
+                    console.log('Correct stop, SSD increased: ', SSD);
+                }
             } else {
                 SSD = SSD - SSDstep;
                 if (SSD <= SSDstep) {
                     SSD = SSDstep;
+                }
+                if (flag_debug) {
+                    console.log('Failed stop, SSD decreased: ', SSD);
                 }
             }
         }
