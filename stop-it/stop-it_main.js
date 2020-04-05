@@ -83,8 +83,8 @@ function bonus_RT_comp(avg_RT) {
         // no bonus
         return 0;
     } else {
-        // the maximum is 75: if avg_RT is less than 400 ms, that's too fast
-        return Math.min(75, Math.round((crit_RT - avg_RT) / 2));
+        // the maximum is 75: if avg_RT is less than 325 ms, that's too fast
+        return Math.min(75, Math.round((crit_RT - avg_RT) / 3));
     }
 }
 
@@ -231,9 +231,9 @@ function save_data() {
  * Instruction block
  */
 var bonus_desc_page1 = '<div class = centerbox><p class = block-text>The <b>performance-based bonus</b> is determined by multiplying RT score, GO score, and STOP score.</p></div>';
-var bonus_desc_page2 = '<div class = centerbox><p class = block-text><b>RT score</b> is (550 ms - your response time) / 2.</p>' +
+var bonus_desc_page2 = '<div class = centerbox><p class = block-text><b>RT score</b> is (550 ms - your response time) / 3.</p>' +
     ' <p class = block-text>If your response time is larger (slower) than 550ms you get no bonus. So please respond as quickly as possible.</p>' +
-    ' <p class = block-text>However, the maximum RT score is 75, so responding faster than 400 ms does no good to you.</p></div>'
+    ' <p class = block-text>However, the maximum RT score is 75, so responding faster than 325 ms gives you the same 75.</p></div>'
 var bonus_desc_page3 = '<div class = centerbox><p class = block-text><b>GO score</b> is <br>(0.25 - the proportion of misses and incorrects) / 0.25.</p>' +
     ' <p class = block-text>If you do not have any misses or incorrects, GO score becomes 1.</p>' +
     ' <p class = block-text>If you miss or respond incorrectly more than 25% of the trials, GO score becomes 0, and you get no bonus. So, please try your best to respond correclty.</p></div>';
