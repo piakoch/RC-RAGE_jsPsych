@@ -5,7 +5,8 @@
     <meta charset='UTF-8'>
     <meta name="robots" content="noindex">
     <title>Stop-Signal Task (STOP-IT)</title>
-    <link rel='stylesheet' type='text/css' href='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/lib/rc-rage.css'>
+    <link rel='stylesheet' type='text/css'
+        href='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/lib/rc-rage.css'>
 </head>
 
 <body>
@@ -34,10 +35,10 @@
             task_id = "stop";
             data_dir = "data03_sst";
 
+            // plan the experimental session
             var jspsych_session = [];
 
             // use the full screen
-
             jspsych_session.push({
                 type: 'fullscreen',
                 fullscreen_mode: true
@@ -89,7 +90,7 @@
                         return focus;
                     }
                 },
-                
+
                 exclusions: { // browser window needs to have these dimensions, if not, participants get the chance to maximize their window, if they don't support this resolution when maximized they can't particiate.
                     min_width: 1000,
                     min_height: 700

@@ -76,6 +76,7 @@ var bFBT = 15000; // break interval between blocks
 // To change the bonus, modify crit_RT and crit_prop below
 var bonus = 0;
 var block_bonus = 0;
+var bonus_feedback = 'simple';
 
 function bonus_RT_comp(avg_RT) {
     var crit_RT = 550;
@@ -244,6 +245,12 @@ var bonus_desc_page4 = '<div class = centerbox><p class = block-text><b>STOP sco
 var bonus_desc_page5 = '<div class = centerbox><p class = block-text>Please remember that <br><b>your bonus = RT score * GO score * STOP score</b>.</p>' +
     ' <p class = block-text>The maximum bonus you can earn in a block is 75 cents.</p></div>';
 
+var bonus_desc_simple =
+    '<div class = centerbox><p class = block-text>The <b>performance-based bonus</b> is determined by how fast and accurate you are on the task.</p>' +
+    ' <p class = block-text>The task is set up so that you should be able to stop yourself from responding 50% of the time the stop signal occurs.' +
+    ' The closer you are to 50% accuracy and the faster you go, the higher your bonus will be.</p>' +
+    ' <p class = block-text>The maximum bonus you can earn in a block is <b>75 cents</b>.</p></div>';
+
 function generate_instruction_block() {
     var block_instruction = [];
     var stop_signal_instructions = {
@@ -261,9 +268,10 @@ function generate_instruction_block() {
             ' <p class = block-text>After all, if you start waiting for stop signals, then the program will delay their presentation. This will result in long reaction times.</p></div>',
             '<div class = centerbox><p class = block-text>We will start with a short practice block in which you will receive immediate feedback. You will no longer receive immediate feedback in the next phases.</p>' +
             ' <p class = block-text>However, at the end of each experimental block, there will be a 15 second break. During this break,' +
-            ' we will show you some information about your mean performance and the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>',
-            bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
-            '<div class = centerbox><p class = block-text>The experiment consists of 2 practice blocks (without actual bonus) and ' + NexpBL.toString() + ' main blocks.</p>' +
+            ' we will show you some information about your mean performance and the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>', // bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
+            bonus_desc_simple,
+            '<div class = centerbox><p class = block-text>The experiment consists of 2 practice blocks (without actual bonus) and ' +
+            NexpBL.toString() + ' main blocks.</p>' +
             ' <p class = block-text><b>IMPORTANT: You earn the bonus only in the main blocks.</b></p></div>',
             '<div class = centerbox><p class = block-text>If you are ready, please click next to start the first practice with immediate, trial-by-trial feedback.</p></div>'
         ],
@@ -278,7 +286,6 @@ function generate_instruction_block() {
         timeline: block_instruction
     };
 }
-
 
 /* 
  * Shared task components
@@ -499,21 +506,40 @@ var block_feedback = {
         block_bonus = Math.round(RT_bonus * GO_bonus * STOP_bonus);
 
         // block summary
-        var block_summary = "<div class = centerbox>" +
-            "<p class = block-text><b>Your bonus is determined by multiplying RT score, GO score, and STOP score.</b></p>" +
-            "<p class = block-text><b>GO TRIALS: </b></p>" +
-            sprintf("<p class = block-text>Average response time = %d ms. <b>RT score</b>: %d.</p>", avg_nsRT, RT_bonus) +
-            sprintf("<p class = block-text>Proportion misses/incorrects = %.2f (should be 0). <br><b>GO score</b>: %.2f.</p>", prop_ns_Missed+prop_ns_Incorrect, GO_bonus) +
-            "<p class = block-text><b>STOP-SIGNAL TRIALS: </b></p>" +
-            sprintf("<p class = block-text>Proportion correct stops = %.2f (should be 0.5). <br><b>STOP score</b>: %.2f.</p>", prop_ss_Correct, STOP_bonus);
-        if (grant_bonus) {
-            block_summary = block_summary +
-                sprintf("<p class = block-text><b>In this block, you earned extra <font color=red>%d (= %d x %.2f x %.2f) cents</font>.</b></p>", block_bonus, RT_bonus, GO_bonus, STOP_bonus) +
-                sprintf("<p class = block-text><b>The total bonus is <font color=blue><span class='large'>%d</span> cents</font>.</b></p>", bonus + block_bonus);
+        if (flag_debug === 'simple') {
+            var block_summary = "<div class = centerbox>" +
+                "<p class = block-text><b>Your bonus is determined by how fast and accurate you are on the task.</b></p>" +
+                "<p class = block-text><b>GO TRIALS: </b></p>" +
+                sprintf("<p class = block-text>Average response time = %d ms.</p>", avg_nsRT) +
+                sprintf("<p class = block-text>Proportion misses/incorrects = %.2f (should be 0).</p>", prop_ns_Missed + prop_ns_Incorrect) +
+                "<p class = block-text><b>STOP-SIGNAL TRIALS: </b></p>" +
+                sprintf("<p class = block-text>Proportion correct stops = %.2f (should be 0.5).</p>", prop_ss_Correct);
+            if (grant_bonus) {
+                block_summary = block_summary +
+                    sprintf("<p class = block-text><b>In this block, you earned extra <font color=red>%d cents</font>.</b></p>", block_bonus) +
+                    sprintf("<p class = block-text><b>The total bonus is <font color=blue><span class='large'>%d</span> cents</font>.</b></p>", bonus + block_bonus);
+            } else {
+                block_summary = block_summary +
+                    sprintf("<p class = block-text><b>The performance-based bonus is <font color=red>%d cents</font>.</b>", block_bonus) +
+                    ' Since this block was practice, you do not get this bonus.</p>';
+            }
         } else {
-            block_summary = block_summary +
-                sprintf("<p class = block-text><b>The performance-based bonus is <font color=red>%d (= %d x %.2f x %.2f) cents</font>.</b>", block_bonus, RT_bonus, GO_bonus, STOP_bonus) +
-                ' Since this block was practice, you do not get this bonus.</p>';
+            var block_summary = "<div class = centerbox>" +
+                "<p class = block-text><b>Your bonus is determined by multiplying RT score, GO score, and STOP score.</b></p>" +
+                "<p class = block-text><b>GO TRIALS: </b></p>" +
+                sprintf("<p class = block-text>Average response time = %d ms. <b>RT score</b>: %d.</p>", avg_nsRT, RT_bonus) +
+                sprintf("<p class = block-text>Proportion misses/incorrects = %.2f (should be 0). <br><b>GO score</b>: %.2f.</p>", prop_ns_Missed + prop_ns_Incorrect, GO_bonus) +
+                "<p class = block-text><b>STOP-SIGNAL TRIALS: </b></p>" +
+                sprintf("<p class = block-text>Proportion correct stops = %.2f (should be 0.5). <br><b>STOP score</b>: %.2f.</p>", prop_ss_Correct, STOP_bonus);
+            if (grant_bonus) {
+                block_summary = block_summary +
+                    sprintf("<p class = block-text><b>In this block, you earned extra <font color=red>%d (= %d x %.2f x %.2f) cents</font>.</b></p>", block_bonus, RT_bonus, GO_bonus, STOP_bonus) +
+                    sprintf("<p class = block-text><b>The total bonus is <font color=blue><span class='large'>%d</span> cents</font>.</b></p>", bonus + block_bonus);
+            } else {
+                block_summary = block_summary +
+                    sprintf("<p class = block-text><b>The performance-based bonus is <font color=red>%d (= %d x %.2f x %.2f) cents</font>.</b>", block_bonus, RT_bonus, GO_bonus, STOP_bonus) +
+                    ' Since this block was practice, you do not get this bonus.</p>';
+            }
         }
         block_summary = block_summary + next_block_text + '</div>';
         return block_summary;
@@ -550,8 +576,8 @@ function generate_second_practice_block() {
         pages: [
             '<div class = centerbox><p class = block-text>The first practice is finished. You will no longer receive immediate trial-by-trial feedback in the next practice.</p></div>',
             '<div class = centerbox><p class = block-text>However, at the end of each block, there will still be a 15 second break. During this break,' +
-            ' we will show you some information about your mean performance and the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>',
-            bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
+            ' we will show you some information about your mean performance and the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>', //bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
+            bonus_desc_simple,
             '<div class = centerbox><p class = block-text>There are one more practice block and ' + NexpBL.toString() + ' main blocks (with actual bonus) to go.' +
             ' <b>IMPORTANT: You will get the bonus only during the main blocks.</b></p>' +
             ' <p class = block-text>Please click next when you are ready for the next practice block!</p></div>'
@@ -580,8 +606,8 @@ var start_main_page = {
     pages: [
         '<div class = centerbox><p class = block-text>The practice is finished, and you are about to go through the main blocks.</p></div>',
         '<div class = centerbox><p class = block-text>Like in practice, at the end of each block, we will show you some information about your mean performance and' +
-        ' the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>',
-        bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
+        ' the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>', // bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
+        bonus_desc_simple,
         '<div class = centerbox><p class = block-text>There are ' + NexpBL.toString() + ' more blocks to go. You will <b>keep all the bonus you earn</b> in these blocks. So, please try your best!</p>' +
         ' <p class = block-text>Please click next when you are ready!</p></div>'
     ],
