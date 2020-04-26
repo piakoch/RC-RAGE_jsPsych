@@ -506,7 +506,7 @@ var block_feedback = {
         block_bonus = Math.round(RT_bonus * GO_bonus * STOP_bonus);
 
         // block summary
-        if (flag_debug === 'simple') {
+        if (bonus_feedback === 'simple') {
             var block_summary = "<div class = centerbox>" +
                 "<p class = block-text><b>Your bonus is determined by how fast and accurate you are on the task.</b></p>" +
                 "<p class = block-text><b>GO TRIALS: </b></p>" +
