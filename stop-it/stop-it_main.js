@@ -77,6 +77,9 @@ var bFBT = 15000; // break interval between blocks
 var bonus = 0;
 var block_bonus = 0;
 var bonus_feedback = 'simple';
+if (bonus_feedback == 'simple') {
+    bFBT = 5000;
+}
 
 function bonus_RT_comp(avg_RT) {
     var crit_RT = 550;
@@ -171,8 +174,6 @@ if (flag_debug) {
 /*
  * Helper functions
  */
-var save_url = 'https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/save_data.php';
-
 function filter_data() {
     var ignore_columns = ['raw_rt', 'trial_type', 'first_stimulus', 'second_stimulus', 'onset_of_first_stimulus',
         'onset_of_second_stimulus', 'key_press', 'correct_response', 'trial_index', 'internal_node_id'
@@ -202,29 +203,40 @@ function filter_data() {
     return selected_data;
 }
 
+// YOU MUST GET YOUR OWN DROPBOX ACCESS TOKEN for uploading the file to your dropbox
+// from https://dropbox.github.io/dropbox-api-v2-explorer/#files_upload
+var dropbox_access_token = '';
+var save_filename = '/' + task_id + '_' + sbjId + '.csv';
+
 function save_data() {
+    // if you prefer json-format, use jsPsych.data.get().json()
+    // if you prefer csv-format, use jsPsych.data.get().csv()
     var selected_data = filter_data();
     if (flag_debug) {
         console.log("Save data function called.");
         console.log(selected_data.csv());
     }
-    jQuery.ajax({
-        type: 'post',
-        cache: false,
-        url: save_url, // this is the path to the above PHP script
-        data: {
-            data_dir: function () {
-                return data_dir;
-            },
-            task_id: function () {
-                return task_id;
-            },
-            sbj_id: function () {
-                return sbjId;
-            },
-            sess_data: selected_data.csv()
-        }
-    });
+    try {
+        var dbx = new Dropbox.Dropbox({
+            accessToken: dropbox_access_token
+        });
+        dbx.filesUpload({
+                path: save_filename,
+                mode: 'overwrite',
+                mute: true,
+                contents: selected_data.csv()
+            })
+            .then(function (response) {
+                if (flag_debug) {
+                    console.log(response);
+                }
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+    } catch (err) {
+        console.log("Save data function failed.", err);
+    }
 }
 
 
@@ -267,7 +279,7 @@ function generate_instruction_block() {
             '<div class = centerbox><p class = block-text>Nevertheless, it is really important that you do not wait for the stop signal to occur and that you respond as quickly and as accurately as possible to the arrows.</p>' +
             ' <p class = block-text>After all, if you start waiting for stop signals, then the program will delay their presentation. This will result in long reaction times.</p></div>',
             '<div class = centerbox><p class = block-text>We will start with a short practice block in which you will receive immediate feedback. You will no longer receive immediate feedback in the next phases.</p>' +
-            ' <p class = block-text>However, at the end of each experimental block, there will be a 15 second break. During this break,' +
+            ' <p class = block-text>However, at the end of each experimental block, there will be a ' + (bFBT/1000).toString() + ' second break. During this break,' +
             ' we will show you some information about your mean performance and the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>', // bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
             bonus_desc_simple,
             '<div class = centerbox><p class = block-text>The experiment consists of 2 practice blocks (without actual bonus) and ' +
@@ -507,21 +519,28 @@ var block_feedback = {
 
         // block summary
         if (bonus_feedback === 'simple') {
-            var block_summary = "<div class = centerbox>" +
-                "<p class = block-text><b>Your bonus is determined by how fast and accurate you are on the task.</b></p>" +
-                "<p class = block-text><b>GO TRIALS: </b></p>" +
-                sprintf("<p class = block-text>Average response time = %d ms.</p>", avg_nsRT) +
-                sprintf("<p class = block-text>Proportion misses/incorrects = %.2f (should be 0).</p>", prop_ns_Missed + prop_ns_Incorrect) +
-                "<p class = block-text><b>STOP-SIGNAL TRIALS: </b></p>" +
-                sprintf("<p class = block-text>Proportion correct stops = %.2f (should be 0.5).</p>", prop_ss_Correct);
+            var block_summary = "<div class = centerbox><br><br><br><br><br><br><br>" +
+                sprintf("<p class = center-block-text>You earned <b><font color=blue>%d cents</font></b> in this block.</p>", block_bonus);
+            if (block_bonus == bonus_RT_comp(0)) { // perfect score
+                block_summary = block_summary +
+                    "<p class = center-block-text>Perfect! You've mastered this task!</p>";
+            } else if (prop_ss_Correct < 0.5) { // when people's stop accuracy < 50% 
+                if (block_ind < (NexpBL + prac_offset)) {
+                    block_summary = block_summary +
+                        "<p class = center-block-text>Try to <font color=red><b>be more accurate</b></font> to increase your bonus.</p>";
+                }
+            } else { // when people's stop accuracy >= 50%
+                if (block_ind < (NexpBL + prac_offset)) {
+                    block_summary = block_summary +
+                        "<p class = center-block-text>Try to <font color=red><b>go faster</b></font> to increase your bonus.</p>";
+                }
+            }
             if (grant_bonus) {
                 block_summary = block_summary +
-                    sprintf("<p class = block-text><b>In this block, you earned extra <font color=red>%d cents</font>.</b></p>", block_bonus) +
-                    sprintf("<p class = block-text><b>The total bonus is <font color=blue><span class='large'>%d</span> cents</font>.</b></p>", bonus + block_bonus);
+                    sprintf("<p class = block-text><br>The total bonus is <b><font color=blue><span class='large'>%d</span> cents</font></b>.</p>", bonus + block_bonus);
             } else {
                 block_summary = block_summary +
-                    sprintf("<p class = block-text><b>The performance-based bonus is <font color=red>%d cents</font>.</b>", block_bonus) +
-                    ' Since this block was practice, you do not get this bonus.</p>';
+                    '<p class = block-text><br>Since this block was practice, you do not get this bonus.</p>';
             }
         } else {
             var block_summary = "<div class = centerbox>" +
