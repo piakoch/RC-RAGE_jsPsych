@@ -5,23 +5,20 @@
     <meta charset='UTF-8'>
     <meta name="robots" content="noindex">
     <title>Stop-Signal Task (STOP-IT)</title>
-    <link rel='stylesheet' type='text/css'
-        href='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/lib/rc-rage.css'>
+    <link rel='stylesheet' type='text/css' href='lib/rc-rage.css'>
 </head>
 
 <body>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropbox.js/4.0.30/Dropbox-sdk.min.js"></script>
-    <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/lib/jspsych.js'></script>
-    <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/lib/jspsych-fullscreen.js'></script>
-    <script src='https://cdn.jsdelivr.net/gh/kywch/RC-RAGE_jsPsych@master/lib/jspsych-instructions.js'></script>
-    <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/jspsych-html-keyboard-response.js'>
-    </script>
-    <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/jspsych-stop-signal-plugin.js'></script>
-    <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/jspsych-detect-held-down-keys.js'>
-    </script>
-    <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/sprintf.js'></script>
-    <script src='https://users.rcc.uchicago.edu/~kywch/RC-RAGE_jsPsych/stop-it/stop-it_main.js'></script>
+    <script src='lib/jspsych.js'></script>
+    <script src='lib/jspsych-fullscreen.js'></script>
+    <script src='lib/jspsych-instructions.js'></script>
+    <script src='stop-it/jspsych-html-keyboard-response.js'></script>
+    <script src='stop-it/jspsych-stop-signal-plugin.js'></script>
+    <script src='stop-it/jspsych-detect-held-down-keys.js'></script>
+    <script src='stop-it/sprintf.js'></script>
+    <script src='stop-it/stop-it_main.js'></script>
 
     <script>
         $(document).ready(function () {
@@ -37,8 +34,8 @@
 
             // Dropbox-related variables
             // YOU MUST GET YOUR OWN DROPBOX ACCESS TOKEN for uploading the file to your dropbox
-            // from https://dropbox.github.io/dropbox-api-v2-explorer/#files_upload
-            dropbox_access_token = 'VnlW6CWPXQMAAAAAAAGXDrkWDvIbOSmkbY1PmT0smMdIK981KgnvoKRjKWapR--q';
+            // see how-to: http://99rabbits.com/get-dropbox-access-token/
+            dropbox_access_token = '';
             save_filename = '/stop-it_202005/' + task_id + '_' + sbjId + '.csv';
 
             // plan the experimental session
