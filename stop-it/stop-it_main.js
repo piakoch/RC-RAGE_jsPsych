@@ -77,9 +77,6 @@ var bFBT = 15000; // break interval between blocks
 var bonus = 0;
 var block_bonus = 0;
 var bonus_feedback = 'simple';
-if (bonus_feedback == 'simple') {
-    bFBT = 5000;
-}
 
 function bonus_RT_comp(avg_RT) {
     var crit_RT = 550;
