@@ -28,11 +28,11 @@ var fullscr_ON = 'no'; // tracks fullscreen activity, initially not activated
 
 // ----- CUSTOMISE THE STIMULI AND RESPONSES -----
 // locate the stimuli that will be used in the experiment
-var fix_stim = 'https://raw.githubusercontent.com/kywch/RC-RAGE_jsPsych/master/stop-it/fix.png';
-var go_stim1 = 'https://raw.githubusercontent.com/kywch/RC-RAGE_jsPsych/master/stop-it/go_left.png';
-var go_stim2 = 'https://raw.githubusercontent.com/kywch/RC-RAGE_jsPsych/master/stop-it/go_right.png';
-var stop_stim1 = 'https://raw.githubusercontent.com/kywch/RC-RAGE_jsPsych/master/stop-it/stop_left.png';
-var stop_stim2 = 'https://raw.githubusercontent.com/kywch/RC-RAGE_jsPsych/master/stop-it/stop_right.png';
+var fix_stim = 'stop-it/fix.png';
+var go_stim1 = 'stop-it/go_left.png';
+var go_stim2 = 'stop-it/go_right.png';
+var stop_stim1 = 'stop-it/stop_left.png';
+var stop_stim2 = 'stop-it/stop_right.png';
 
 // define the appropriate response (key) for each stimulus
 // (this will also be used to set the allowed response keys)
@@ -306,7 +306,10 @@ function generate_instruction_block() {
 // start of each block
 var block_start_page = {
     type: 'html-keyboard-response',
-    stimulus: '<p class = center-text>Press space to begin.</p>',
+    stimulus: function() {
+        console.log('Block index: ', block_ind);
+        return '<p class = center-text>Press space to begin.</p>';
+    },
     choices: ['space']
 };
 
