@@ -597,7 +597,7 @@ function generate_second_practice_block() {
         type: "instructions",
         pages: [
             '<div class = centerbox><p class = block-text>The first practice is finished. You will no longer receive immediate trial-by-trial feedback in the next practice.</p></div>',
-            '<div class = centerbox><p class = block-text>However, at the end of each block, there will still be a 15 second break. During this break,' +
+            '<div class = centerbox><p class = block-text>However, at the end of each block, there will still be a ' + (bFBT/1000).toString() + ' second break. During this break,' +
             ' we will show you some information about your mean performance and the <font color=red><b>resulting performance-based bonus</b></font> in the previous block.</p></div>', //bonus_desc_page1, bonus_desc_page2, bonus_desc_page3, bonus_desc_page4, bonus_desc_page5,
             bonus_desc_simple,
             '<div class = centerbox><p class = block-text>There are one more practice block and ' + NexpBL.toString() + ' main blocks (with actual bonus) to go.' +
