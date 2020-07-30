@@ -80,7 +80,7 @@ var bonus_feedback = 'simple';
 
 function bonus_RT_comp(avg_RT) {
     var crit_RT = 550;
-    if (avg_RT > crit_RT) {
+    if ((avg_RT > crit_RT) || isNaN(avg_nsRT)) {
         // no bonus
         return 0;
     } else {
