@@ -130,6 +130,7 @@ p {
 
 .block-text {
     width: 100%;
+    text-align: left;
     margin: 0 auto;
     margin-bottom: 1em;
     font-size: 2.5vh;
