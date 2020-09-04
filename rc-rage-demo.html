@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html class=''>
+
+<head>
+  <meta charset='UTF-8'>
+  <meta name="robots" content="noindex">
+  <title>Retaliate or Carry-on: Reactive AGression Experiment</title>
+  <link rel='stylesheet' type='text/css' href='lib/rc-rage.css'>
+
+  <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'></script>
+  <script src='lib/jspsych-6.1.0/jspsych.js'></script>
+  <script src='lib/jspsych-6.1.0/plugins/jspsych-fullscreen.js'></script>
+  <script src='lib/jspsych-6.1.0/plugins/jspsych-instructions.js'></script>
+  <script src='lib/jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js'></script>
+  <script src='lib/jspsych-audio-keyboard-with-replay.js'></script>
+  <script src='lib/jspsych-rc-rage.js'></script>
+  <script src='lib/rc-rage_main.js'></script>
+</head>
+
+<body>
+
+  <!-- Change 3: Adding extra scripts for Qualtrics -->
+  <!-- COPY PASTE TO QUALTRICS FROM HERE -->
+  <link href="https://kywch.github.io/RC-RAGE_jsPsych/lib/rc-rage.css" rel="stylesheet" type="text/css">
+  </link>
+  <div>
+    <span style="font-size: 24px;">
+      <br><br>
+      If you are seeing this message for <span style="color: rgb(255, 0, 0);">
+        <b>more than 5 minutes</b></span>,<br>
+      please screen-capture this screen and send the image to us.
+      <br><br>
+      <span style="font-size: 28px;">We are very sorry for the inconvenience.</span>
+    </span>
+  </div>
+
+  <!-- Change 2: Adding `display_stage` CSS and Div -->
+  <style>
+    #display_stage_background {
+      width: 100vw;
+      background-color: white;
+      z-index: -1;
+    }
+
+    #display_stage {
+      position: fixed;
+      left: 1vw;
+      top: 1vh;
+      height: 98vh;
+      width: 98vw;
+      background-color: white;
+      box-shadow: 1px 1px 1px #999;
+      border-radius: 15px;
+      z-index: 0;
+      overflow-y: hidden;
+      overflow-x: hidden;
+    }
+  </style>
+  <!-- COPY PASTE TO QUALTRICS UP TO HERE -->
+
+  <div id='display_stage_background'></div>
+  <div id='display_stage'></div>
+
+</body>
+
+<script>
+  var instr_url = 'instruction/';
+  var instr_imglist = get_instruction_imglist(instr_url, 30);
+
+  var jspsych_session = [];
+
+  // use the full screen
+  jspsych_session.push({
+    type: 'fullscreen',
+    fullscreen_mode: true
+  });
+
+  /*
+  jspsych_session.push({
+    timeline: generate_instruction_block(instr_imglist)
+  });
+
+  jspsych_session.push({
+    timeline: generate_practice_block()
+  });
+  */
+
+  jspsych_session.push({
+    timeline: generate_main_block()
+  });
+
+  // debrief block
+  jspsych_session.push({
+    type: "html-keyboard-response",
+    stimulus: function () {
+
+      // performance-based bonus in dollar (in string)
+      let bonus = (main_score / 100).toFixed(2);
+
+      // the trial sequence (specifies when the robber appears)
+      let trial_seq = main_seq;
+      trial_seq.forEach(function (item, ii) {
+        if (item > 1000) trial_seq[ii] = -1; // robber did not appear
+      });
+      trial_seq = trial_seq.toString().replace(/,/g, ';');
+
+      // participants' click counts for each trial
+      let click_cnt = click_history.reduce(function (a, b) {
+        return (a + b);
+      }).toString();
+
+      // completed trials (within the time limit)
+      var comp_trial_cnt = wasted_click_history.filter(x => x >= 0).length;
+
+      // the number of trials, in which the robber appeared
+      var provoked_cnt = main_seq.slice(0, comp_trial_cnt).filter(x => x > 0).length;
+
+      // the number of trials, in which the robber was killed by retailation
+      var kill_cnt = wasted_click_history.filter(x => x > 0).length;
+
+      return "<div class = centerbox><p><p>" +
+        "<p class = block-text>Your performance-based bonus: $" + bonus + "</p>" +
+        "<p class = block-text>Number of completed trials: " + comp_trial_cnt + " out of " + main_seq.length
+      .toString() + "</p>" +
+        "<p class = block-text>Number of provocations: " + provoked_cnt + "</p>" +
+        "<p class = block-text>Number of retaliations: " + kill_cnt + "</p>" +
+        "<p class = block-text>Press any key to complete the experiment. Thank you!</p></div>";
+    }
+  });
+
+  // exit the full screen
+  jspsych_session.push({
+    type: 'fullscreen',
+    fullscreen_mode: false
+  });
+
+  // run the experiment!
+  jsPsych.init({
+
+    /* Change 1: Using `display_element` */
+    display_element: 'display_stage',
+    timeline: jspsych_session,
+    preload_images: instr_imglist,
+
+    exclusions: { // browser window needs to have these dimensions, if not, participants get the chance to maximize their window, if they don't support this resolution when maximized they can't particiate.
+      min_width: 1000,
+      min_height: 700
+    }
+
+  })
+</script>
+
+</html>
