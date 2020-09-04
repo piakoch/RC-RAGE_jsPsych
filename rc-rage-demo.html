@@ -75,7 +75,6 @@
     fullscreen_mode: true
   });
 
-  /*
   jspsych_session.push({
     timeline: generate_instruction_block(instr_imglist)
   });
@@ -83,7 +82,6 @@
   jspsych_session.push({
     timeline: generate_practice_block()
   });
-  */
 
   jspsych_session.push({
     timeline: generate_main_block()
@@ -121,7 +119,7 @@
       return "<div class = centerbox><p><p>" +
         "<p class = block-text>Your performance-based bonus: $" + bonus + "</p>" +
         "<p class = block-text>Number of completed trials: " + comp_trial_cnt + " out of " + main_seq.length
-      .toString() + "</p>" +
+        .toString() + "</p>" +
         "<p class = block-text>Number of provocations: " + provoked_cnt + "</p>" +
         "<p class = block-text>Number of retaliations: " + kill_cnt + "</p>" +
         "<p class = block-text>Press any key to complete the experiment. Thank you!</p></div>";
