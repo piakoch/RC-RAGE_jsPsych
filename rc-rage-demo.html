@@ -7,6 +7,7 @@
   <title>Retaliate or Carry-on: Reactive AGression Experiment</title>
   <link rel='stylesheet' type='text/css' href='lib/rc-rage.css'>
 
+  <!-- Step 1. Define and load required resources -->
   <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js'></script>
   <script src='lib/jspsych-6.1.0/jspsych.js'></script>
   <script src='lib/jspsych-6.1.0/plugins/jspsych-fullscreen.js'></script>
@@ -19,7 +20,7 @@
 
 <body>
 
-  <!-- Change 3: Adding extra scripts for Qualtrics -->
+  <!-- Step 2: Add `display_stage` CSS, DIV, and extra scripts for Qualtrics -->
   <!-- COPY PASTE TO QUALTRICS FROM HERE -->
   <link href="https://kywch.github.io/RC-RAGE_jsPsych/lib/rc-rage.css" rel="stylesheet" type="text/css">
   </link>
@@ -34,7 +35,6 @@
     </span>
   </div>
 
-  <!-- Change 2: Adding `display_stage` CSS and Div -->
   <style>
     #display_stage_background {
       width: 100vw;
@@ -64,6 +64,9 @@
 </body>
 
 <script>
+
+  /* Step 3: Define the experiment flow */
+  // NOTE that the functions used below are defined in `rc-rage_main.js` for readability
   var instr_url = 'instruction/';
   var instr_imglist = get_instruction_imglist(instr_url, 30);
 
@@ -87,7 +90,9 @@
     timeline: generate_main_block()
   });
 
-  // debrief block
+  /* Step 4: Show the aggregate session-level data */
+  // NOTE that main_score, main_seq, click_history, wasted_click_history are defined in rc-rage_main.js
+  // The below lines take advantage of these rather than going through the raw data
   jspsych_session.push({
     type: "html-keyboard-response",
     stimulus: function () {
@@ -132,10 +137,9 @@
     fullscreen_mode: false
   });
 
-  // run the experiment!
+  /* Step 5: Run the experiment. */
   jsPsych.init({
 
-    /* Change 1: Using `display_element` */
     display_element: 'display_stage',
     timeline: jspsych_session,
     preload_images: instr_imglist,
@@ -144,8 +148,7 @@
       min_width: 1000,
       min_height: 700
     }
-
-  })
+  });
 </script>
 
 </html>

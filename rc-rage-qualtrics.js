@@ -15,8 +15,8 @@ Qualtrics.SurveyEngine.addOnload(function () {
     // Hide buttons
     qthis.hideNextButton();
 
-    /* Change 2: Defining and load required resources */
-    // requiredResources must include all the required JS files
+    /* Change 2: Defining and loading required resources */
+    // `requiredResources` must include all the required JS files
     var task_github = "https://kywch.github.io/RC-RAGE_jsPsych/"; // https://<your-github-username>.github.io/<your-experiment-name>
     var requiredResources = [
         task_github + "lib/jspsych-6.1.0/jspsych.js",
@@ -94,7 +94,7 @@ Qualtrics.SurveyEngine.addOnload(function () {
 
             on_finish: function () {
 
-                /* Change 5: Summarizing and saving the results, then finishing the study.*/
+                /* Change 5: Summarizing and saving the results, then finishing the study */
 
                 // NOTE that main_score, main_seq, click_history, wasted_click_history
                 // are all alreday defined in rc-rage_main.js
