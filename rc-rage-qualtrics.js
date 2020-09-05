@@ -137,8 +137,8 @@ Qualtrics.SurveyEngine.addOnload(function () {
                 Qualtrics.SurveyEngine.setEmbeddedData("wasted_click_history", wasted_click_history.toString().replace(/,/g, ';'));                                
 
                 // clear the stage
-                jQuery('display_stage').remove();
-                jQuery('display_stage_background').remove();
+                jQuery('#display_stage').remove();
+                jQuery('#display_stage_background').remove();
 
                 // simulate click on Qualtrics "next" button, making use of the Qualtrics JS API
                 qthis.clickNextButton();
