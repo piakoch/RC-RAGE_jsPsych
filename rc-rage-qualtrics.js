@@ -4,7 +4,8 @@ Qualtrics.SurveyEngine.addOnload(function () {
 
     /* PLEASE CHECK:
         TO RUN THIS SCRIPT PROPERLY, THE EMBEDDED VARIABLES 
-            *** bonus, click_cnt, finished_trial_cnt, provoked_cnt, kill_cnt, planned_trial, wasted_click_history ***
+            aggregated data: *** bonus, click_cnt, finished_trial_cnt, provoked_cnt, kill_cnt ***
+            trial-level data *** planned_trial, wasted_click_history, trial_data *** (redundant)
         MUST BE DEFINED.
     /*
 
@@ -94,7 +95,7 @@ Qualtrics.SurveyEngine.addOnload(function () {
 
             on_finish: function () {
 
-                /* Change 5: Summarizing and saving the results, then finishing the study */
+                /* Change 5: Summarizing and saving the aggregated results */
 
                 // NOTE that main_score, main_seq, click_history, wasted_click_history
                 // are all alreday defined in rc-rage_main.js
@@ -130,18 +131,41 @@ Qualtrics.SurveyEngine.addOnload(function () {
                 Qualtrics.SurveyEngine.setEmbeddedData("finished_trial_cnt", comp_trial_cnt);
                 Qualtrics.SurveyEngine.setEmbeddedData("provoked_cnt", provoked_cnt);
                 Qualtrics.SurveyEngine.setEmbeddedData("kill_cnt", kill_cnt);
-                
+
                 // the simple trial-level data
                 // NOTE that detailed trial-level data are not saved here, but it can be done.                
                 Qualtrics.SurveyEngine.setEmbeddedData("planned_trial", trial_seq);
-                Qualtrics.SurveyEngine.setEmbeddedData("wasted_click_history", wasted_click_history.toString().replace(/,/g, ';'));                                
+                Qualtrics.SurveyEngine.setEmbeddedData("wasted_click_history", wasted_click_history.toString().replace(/,/g, ';'));
 
-                // clear the stage
-                jQuery('#display_stage').remove();
-                jQuery('#display_stage_background').remove();
 
-                // simulate click on Qualtrics "next" button, making use of the Qualtrics JS API
-                qthis.clickNextButton();
+                /* Change 6: Saving the trial-level data and finishing up */
+                // save the data
+                Qualtrics.SurveyEngine.setEmbeddedData("trial_data", result_string);
+
+                function sleep(time) {
+                    return new Promise((resolve) => setTimeout(resolve, time));
+                }
+
+                sleep(500).then(() => {
+                    saved_string = Qualtrics.SurveyEngine.getEmbeddedData("trial_data");
+                    //console.log(saved_string);
+                    if (result_string !== saved_string) {
+                        console.log('There was a problem with saving data. Trying again...')
+                        // try to save it once more, but no guarantee
+                        Qualtrics.SurveyEngine.setEmbeddedData("trial_data", result_string);
+                    } else {
+                        console.log('Save was successful.')
+                    }
+                });
+
+                sleep(500).then(() => {
+                    // clear the stage
+                    jQuery('#display_stage').remove();
+                    jQuery('#display_stage_background').remove();
+
+                    // simulate click on Qualtrics "next" button, making use of the Qualtrics JS API
+                    qthis.clickNextButton();
+                });
             }
         });
     }

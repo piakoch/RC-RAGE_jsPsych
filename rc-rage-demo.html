@@ -64,7 +64,6 @@
 </body>
 
 <script>
-
   /* Step 3: Define the experiment flow */
   // NOTE that the functions used below are defined in `rc-rage_main.js` for readability
   var instr_url = 'instruction/';
@@ -147,6 +146,20 @@
     exclusions: { // browser window needs to have these dimensions, if not, participants get the chance to maximize their window, if they don't support this resolution when maximized they can't particiate.
       min_width: 1000,
       min_height: 700
+    },
+
+    on_finish: function () {
+      // csv-like string: delimiter - space (' '), newline - semicolon (';')
+      // result_string contains: 'trial image11 image12 click rt;'
+      console.log(result_string);
+
+      // Also display in the result page as well
+      var display_element = jsPsych.getDisplayElement();
+      display_element.innerHTML =
+        "Results will be stored as a single string variable with a csv-like formatting<br>" +
+        "so that it can easily saved into Qualtrics Embedded Data.<p>" +
+        "delimiter - space (' '), newline - semicolon (';')<p>" +
+        "<b>Result string ==></b> " + result_string;
     }
   });
 </script>
