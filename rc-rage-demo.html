@@ -68,7 +68,7 @@
   /* Step 3: Define the experiment flow */
   // NOTE that the functions used below are defined in `rc-rage_main.js` for readability
   var instr_url = 'instruction/';
-  var instr_imglist = get_instruction_imglist(instr_url, 30);
+  var instr_imglist = get_instruction_imglist(instr_url, 28);
 
   var jspsych_session = [];
 
@@ -82,9 +82,9 @@
     timeline: generate_instruction_block(instr_imglist)
   });
 
-  jspsych_session.push({
-    timeline: generate_practice_block()
-  });
+  // jspsych_session.push({
+  //   timeline: generate_practice_block()
+  // });
 
   jspsych_session.push({
     timeline: generate_main_block()
