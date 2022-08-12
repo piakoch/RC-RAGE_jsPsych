@@ -15,7 +15,6 @@
   <script src='lib/jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js'></script>
   <script src='lib/jspsych-audio-keyboard-with-replay.js'></script>
   <script src='lib/jspsych-rc-rage.js'></script>
-  <script src='lib/jspsych-matchmaking.js'></script>
   <script src='lib/rc-rage_main.js'></script>
 </head>
 
@@ -68,7 +67,7 @@
   /* Step 3: Define the experiment flow */
   // NOTE that the functions used below are defined in `rc-rage_main.js` for readability
   var instr_url = 'instruction/';
-  var instr_imglist = get_instruction_imglist(instr_url, 28);
+  var instr_imglist = get_instruction_imglist(instr_url, 30);
 
   var jspsych_session = [];
 
@@ -82,9 +81,9 @@
     timeline: generate_instruction_block(instr_imglist)
   });
 
-  // jspsych_session.push({
-  //   timeline: generate_practice_block()
-  // });
+  jspsych_session.push({
+    timeline: generate_practice_block()
+  });
 
   jspsych_session.push({
     timeline: generate_main_block()

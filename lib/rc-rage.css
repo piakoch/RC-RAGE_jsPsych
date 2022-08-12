@@ -219,16 +219,3 @@ img.resize {
     margin-right: auto;
     object-fit: contain;
 }
-
-/* CSS for matchmaking screen */ 
-
-
-.matchmaker {
-    animation: blinker 2s linear infinite;
-  }
-  
-  @keyframes blinker {
-    50% {
-      opacity: 0;
-    }
-  }
